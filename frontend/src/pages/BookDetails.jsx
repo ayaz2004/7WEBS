@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Book, Star, Calendar, Tag, User, Edit3, MessageCircle, ArrowLeft } from 'lucide-react';
-import api from '../api';
+import api from '../api/index';
 
 const BookDetail = () => {
     const { id } = useParams();

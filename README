@@ -1,0 +1,82 @@
+Directory structure of Book-review:
+└── ayaz2004-7webs/
+    ├── backend/
+    │   ├── package.json
+    │   ├── server.js
+    │   ├── config/
+    │   │   └── db.js
+    │   ├── controllers/
+    │   │   ├── authController.js
+    │   │   ├── bookController.js
+    │   │   └── reviewController.js
+    │   ├── middleware/
+    │   │   └── authMiddleware.js
+    │   ├── models/
+    │   │   ├── Book.js
+    │   │   ├── Review.js
+    │   │   └── User.js
+    │   └── routes/
+    │       ├── authRoutes.js
+    │       ├── bookRoutes.js
+    │       └── reviewRoutes.js
+    └── frontend/
+        ├── README.md
+        ├── eslint.config.js
+        ├── index.html
+        ├── package.json
+        ├── vite.config.js
+        └── src/
+            ├── App.jsx
+            ├── index.css
+            ├── main.jsx
+            ├── api/
+            │   └── index.js
+            ├── components/
+            │   ├── BookCard.jsx
+            │   ├── Footer.jsx
+            │   ├── Navbar.jsx
+            │   └── Pagination.jsx
+            ├── pages/
+            │   ├── AddBook.jsx
+            │   ├── AuthPage.jsx
+            │   ├── BookDetails.jsx
+            │   ├── Home.jsx
+            │   ├── Library.jsx
+            │   └── MyReviews.jsx
+            └── routes/
+                └── AuthRoutes.jsx
+
+For backend set-up:
+-cd backend
+-npm install
+-npm run dev
+
+Note - You need to set-up the env file.
+
+For frontend set-up:
+-cd frontend
+-npm run dev
+-npm run dev
+   
+Tech Stack used:
+
+Backend
+Runtime Environment: Node.js
+Web Framework: Express.js
+Database: MongoDB (a NoSQL database)
+ODM (Object Data Modeling): Mongoose (for interacting with MongoDB)
+Authentication: JSON Web Tokens (JWT) for handling user sessions and bcryptjs for password hashing.
+API Validation: express-validator for validating incoming request data.
+
+Frontend
+Core Library: React (using Hooks and functional components)
+Build Tool: Vite
+Styling: Tailwind CSS (a utility-first CSS framework)
+Routing: React Router DOM (for handling navigation between pages)
+HTTP Client: Axios (for making API requests to the backend)
+Icons: Lucide React (for clean and consistent icons)
+
+
+Deployment
+Backend Hosting: Render
+Frontend Hosting: Vercel
