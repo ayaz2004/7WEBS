@@ -1,5 +1,6 @@
 Directory structure of Book-review:
 └── ayaz2004-7webs/
+    ├── README
     ├── backend/
     │   ├── package.json
     │   ├── server.js
@@ -45,6 +46,7 @@ Directory structure of Book-review:
             │   └── MyReviews.jsx
             └── routes/
                 └── AuthRoutes.jsx
+
 
 For backend set-up:
 -cd backend
