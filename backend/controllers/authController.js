@@ -1,4 +1,5 @@
-const User = require('../models/User.js');
+/* --- controllers/authController.js --- */
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
@@ -8,25 +9,28 @@ const generateToken = (id) => {
     });
 };
 
+// --- SIGNUP ---
 exports.signup = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
     try {
-        let user = await User.findOne({ username });
+        // Check if username OR email is already taken
+        let user = await User.findOne({ $or: [{ username }, { email }] });
         if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'User with that username or email already exists' });
         }
 
-        user = new User({ username, password });
+        // Create new user with email
+        user = new User({ username, email, password });
         await user.save();
 
         const token = generateToken(user._id);
-        res.status(201).json({ token, username: user.username });
+        res.status(201).json({ token, username: user.username, email: user.email });
 
     } catch (err) {
         console.error(err.message);
@@ -34,16 +38,22 @@ exports.signup = async (req, res) => {
     }
 };
 
+// --- LOGIN ---
 exports.login = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password } = req.body;
+    // The 'loginIdentifier' can be either a username or an email
+    const { loginIdentifier, password } = req.body;
 
     try {
-        const user = await User.findOne({ username }).select('+password');
+        // Find user by either their username or email
+        const user = await User.findOne({ 
+            $or: [{ username: loginIdentifier }, { email: loginIdentifier }] 
+        }).select('+password');
+
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -54,7 +64,7 @@ exports.login = async (req, res) => {
         }
         
         const token = generateToken(user._id);
-        res.json({ token, username: user.username });
+        res.json({ token, username: user.username, email: user.email });
 
     } catch (err) {
         console.error(err.message);
