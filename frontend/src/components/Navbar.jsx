@@ -1,65 +1,60 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Book, Home, Library, Plus, User, Menu, X, LogOut } from 'lucide-react';
 
+const getInitialAuthState = () => {
+    if (typeof window === 'undefined') {
+        return { isAuthenticated: false, user: null };
+    }
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (token && userData) {
+        try {
+            return { isAuthenticated: true, user: JSON.parse(userData) };
+        } catch (error) {
+            console.error('Error parsing initial user data:', error);
+            return { isAuthenticated: false, user: null };
+        }
+    }
+    return { isAuthenticated: false, user: null };
+};
+
 const Navbar = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
-    const [user, setUser] = useState(null);
+    const [authState, setAuthState] = useState(getInitialAuthState);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
-    const updateAuthState = () => {
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
-        
-        if (token && userData) {
-            setIsAuthenticated(true);
-            try {
-                setUser(JSON.parse(userData));
-            } catch (error) {
-                console.error('Error parsing user data:', error);
-                setUser(null);
-            }
-        } else {
-            setIsAuthenticated(false);
-            setUser(null);
-        }
-    };
-
     useEffect(() => {
-        updateAuthState();
-        window.addEventListener('authChange', updateAuthState);
+        const updateAuthStateFromEvent = () => {
+            setAuthState(getInitialAuthState());
+        };
+
+        window.addEventListener('authChange', updateAuthStateFromEvent);
         const handleScroll = () => setIsScrolled(window.scrollY > 10);
         window.addEventListener('scroll', handleScroll);
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('authChange', updateAuthState);
+            window.removeEventListener('authChange', updateAuthStateFromEvent);
         };
     }, []);
 
     const handleLogout = () => {
-        // Clear authentication data from storage
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        
+        // Dispatch event for an instant, smooth state update across the app
+        window.dispatchEvent(new Event('authChange'));
 
-        // Close any open menus
         setIsUserMenuOpen(false);
         setIsMobileMenuOpen(false);
-        
-        // Navigate to the home page
         navigate('/');
-
-        // Force a full page reload. This is the most reliable way to ensure
-        // all components reset their state and reflect the logged-out status.
-        window.location.reload();
     };
 
-    const navItems = isAuthenticated 
+    const navItems = authState.isAuthenticated 
         ? [
             { name: 'Home', path: '/', icon: Home },
             { name: 'Library', path: '/books', icon: Library },
@@ -113,7 +108,7 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        {isAuthenticated ? (
+                        {authState.isAuthenticated ? (
                             <div className="relative">
                                 <button
                                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -122,15 +117,13 @@ const Navbar = () => {
                                     <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                                         <User className="text-yellow-600" size={14} />
                                     </div>
-                                    {/* Correctly display username */}
-                                    <span className="hidden sm:block text-sm font-medium">{user?.username || 'User'}</span>
+                                    <span className="hidden sm:block text-sm font-medium">{authState.user?.username || 'User'}</span>
                                 </button>
                                 {isUserMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-yellow-200 py-2 z-50">
                                         <div className="px-4 py-2 border-b border-gray-100">
-                                            {/* Correctly display username and email */}
-                                            <p className="text-sm font-medium text-gray-900 truncate">{user?.username || 'User'}</p>
-                                            <p className="text-xs text-gray-500 truncate">{user?.email || 'user@example.com'}</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate">{authState.user?.username || 'User'}</p>
+                                            <p className="text-xs text-gray-500 truncate">{authState.user?.email || 'user@example.com'}</p>
                                         </div>
                                         <button 
                                             onClick={handleLogout}
@@ -154,21 +147,17 @@ const Navbar = () => {
                 {isMobileMenuOpen && (
                     <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-yellow-200 shadow-lg">
                         <div className="px-4 py-4 space-y-2">
-                            {navItems.map((item) => {
-                                const IconComponent = item.icon;
-                                const isActive = isActivePath(item.path);
-                                return (
-                                    <Link
-                                        key={item.name}
-                                        to={item.path}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className={`flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-white' : 'text-gray-700 hover:bg-yellow-100'}`}
-                                    >
-                                        <IconComponent size={20} />
-                                        <span>{item.name}</span>
-                                    </Link>
-                                );
-                            })}
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.name}
+                                    to={item.path}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`flex items-center space-x-3 px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${isActivePath(item.path) ? 'bg-gradient-to-r from-yellow-400 to-amber-400 text-white' : 'text-gray-700 hover:bg-yellow-100'}`}
+                                >
+                                    <item.icon size={20} />
+                                    <span>{item.name}</span>
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 )}
