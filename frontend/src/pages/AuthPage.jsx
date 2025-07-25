@@ -45,7 +45,7 @@ const AuthPage = () => {
 
             // Redirect to the books page after a short delay
             setTimeout(() => {
-                navigate('/books'); 
+                navigate('/'); 
                 // You might want to force a page reload to update the Navbar state
                 window.location.reload();
             }, 1000);
