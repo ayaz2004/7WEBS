@@ -55,7 +55,6 @@ const Library = () => {
                     </p>
                 </div>
             
-                {/* Filter Section */}
                 <div className="flex flex-col md:flex-row gap-6 mb-12 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-yellow-200/50">
                     <div className="relative flex-1">
                         <Feather className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
