@@ -200,7 +200,7 @@ const Home = () => {
                         <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-gray-900">Your Activity</h2>
-                                <Link to="/profile" className="text-yellow-600 hover:text-yellow-700 font-medium">View profile</Link>
+                                <Link to="/my-reviews" className="text-yellow-600 hover:text-yellow-700 font-medium">View profile</Link>
                             </div>
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
